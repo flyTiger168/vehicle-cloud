@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Card, Col, Row, Statistic, Table, Tag, Progress } from 'antd';
-import { CarOutlined, UserOutlined, DashboardOutlined } from '@ant-design/icons';
+import { CarOutlined, UserOutlined, DashboardOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { listVehicles } from '../api/vehicleApi';
 import { listUsers } from '../api/userApi';
+import { getLatestAll } from '../api/statusApi';
 
 const modelColorMap = {
   'AITO M5': '#1677ff',
@@ -13,20 +14,28 @@ const modelColorMap = {
 function Dashboard() {
   const [vehicles, setVehicles] = useState([]);
   const [users, setUsers] = useState([]);
+  const [statusList, setStatusList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let ignore = false;
-    Promise.all([listVehicles(), listUsers()])
-      .then(([vList, uList]) => {
+    Promise.all([listVehicles(), listUsers(), getLatestAll()])
+      .then(([vList, uList, sList]) => {
         if (!ignore) {
           setVehicles(vList || []);
           setUsers(uList || []);
+          setStatusList(sList || []);
         }
       })
       .finally(() => { if (!ignore) setLoading(false); });
     return () => { ignore = true; };
   }, []);
+
+  // 状态统计
+  const avgBattery = statusList.length
+    ? (statusList.reduce((sum, s) => sum + (s.batteryLevel || 0), 0) / statusList.length).toFixed(1)
+    : 0;
+  const lowBatteryCount = statusList.filter((s) => s.batteryLevel < 30).length;
 
   // 车型统计
   const modelStats = {};
@@ -70,6 +79,24 @@ function Dashboard() {
         <Col span={6}>
           <Card hoverable>
             <Statistic title="人均车辆" value={users.length ? (vehicles.length / users.length).toFixed(1) : 0} suffix="辆" loading={loading} />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col span={8}>
+          <Card hoverable>
+            <Statistic title="上报车辆数" value={statusList.length} prefix={<ThunderboltOutlined />} loading={loading} />
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card hoverable>
+            <Statistic title="车队平均电量" value={avgBattery} suffix="%" loading={loading} />
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card hoverable>
+            <Statistic title="低电量车辆" value={lowBatteryCount} valueStyle={{ color: '#cf1322' }} loading={loading} />
           </Card>
         </Col>
       </Row>
