@@ -2,8 +2,8 @@ import request from './request';
 
 const BASE = '/api/v1/vehicles';
 
-export function listVehicles() {
-  return request.get(BASE);
+export function listVehicles(page = 0, pageSize = 10) {
+  return request.get(BASE, { params: { page, pageSize } });
 }
 
 export function getVehicle(id) {

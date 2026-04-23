@@ -7,6 +7,8 @@ import com.wenjie.cloud.vehicle.repository.VehicleRepository;
 import com.wenjie.cloud.vehicle.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,13 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicleRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<VehicleDTO> listVehicles(Pageable pageable) {
+        return vehicleRepository.findAll(pageable)
+                .map(this::toDTO);
     }
 
     @Override

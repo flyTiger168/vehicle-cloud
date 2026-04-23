@@ -4,12 +4,15 @@ import com.wenjie.cloud.common.dto.ApiResponse;
 import com.wenjie.cloud.vehicle.dto.VehicleDTO;
 import com.wenjie.cloud.vehicle.service.VehicleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -42,11 +45,13 @@ public class VehicleController {
     }
 
     /**
-     * 查询车辆列表
+     * 分页查询车辆列表
      */
     @GetMapping
-    public ApiResponse<List<VehicleDTO>> listVehicles() {
-        return ApiResponse.success(vehicleService.listVehicles());
+    public ApiResponse<Page<VehicleDTO>> listVehicles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return ApiResponse.success(vehicleService.listVehicles(PageRequest.of(page, pageSize)));
     }
 
     /**

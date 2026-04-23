@@ -16,19 +16,35 @@ function VehicleList() {
   const [formOpen, setFormOpen] = useState(false);
   const [filterModel, setFilterModel] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+
+  const fetchData = useCallback((page = 0, pageSize = 10) => {
+    setLoading(true);
+    listVehicles(page, pageSize)
+      .then((res) => {
+        setData(res.content || []);
+        setPagination((prev) => ({
+          ...prev,
+          current: (res.number ?? 0) + 1,
+          pageSize: res.size ?? pageSize,
+          total: res.totalElements ?? 0,
+        }));
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
-    let ignore = false;
-    listVehicles()
-      .then((list) => { if (!ignore) setData(list || []); })
-      .finally(() => { if (!ignore) setLoading(false); });
-    return () => { ignore = true; };
-  }, [refreshKey]);
+    fetchData(pagination.current - 1, pagination.pageSize);
+  }, [refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const reload = useCallback(() => {
-    setLoading(true);
     setRefreshKey((k) => k + 1);
   }, []);
+
+  const handleTableChange = (pag) => {
+    setPagination(pag);
+    fetchData(pag.current - 1, pag.pageSize);
+  };
 
   const handleDelete = async (id) => {
     await deleteVehicle(id);
@@ -85,7 +101,8 @@ function VehicleList() {
         columns={columns}
         dataSource={filteredData}
         loading={loading}
-        pagination={{ pageSize: 10, showTotal: (total) => `共 ${total} 辆` }}
+        pagination={{ ...pagination, showTotal: (total) => `共 ${total} 辆`, showSizeChanger: true }}
+        onChange={handleTableChange}
       />
       <VehicleForm
         open={formOpen}
