@@ -5,12 +5,10 @@ import {
   DashboardOutlined,
   CarOutlined,
   UserOutlined,
-  ThunderboltOutlined,
 } from '@ant-design/icons';
 import Dashboard from './pages/Dashboard';
 import VehicleList from './pages/VehicleList';
 import UserList from './pages/UserList';
-import VehicleStatus from './pages/VehicleStatus';
 
 const { Header, Sider, Content } = Layout;
 
@@ -18,7 +16,6 @@ const menuItems = [
   { key: '/', icon: <DashboardOutlined />, label: <Link to="/">仪表盘</Link> },
   { key: '/vehicles', icon: <CarOutlined />, label: <Link to="/vehicles">车辆管理</Link> },
   { key: '/users', icon: <UserOutlined />, label: <Link to="/users">用户管理</Link> },
-  { key: '/status', icon: <ThunderboltOutlined />, label: <Link to="/status">车辆状态</Link> },
 ];
 
 function App() {
@@ -65,7 +62,6 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/vehicles" element={<VehicleList />} />
               <Route path="/users" element={<UserList />} />
-              <Route path="/status" element={<VehicleStatus />} />
             </Routes>
           </div>
         </Content>

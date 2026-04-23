@@ -38,7 +38,6 @@
         <module>vehicle-common</module>
         <module>vehicle-service</module>
         <module>user-service</module>
-        <module>vehicle-status-service</module>
         <!-- <module>vehicle-gateway</module> -->
     </modules>
 
